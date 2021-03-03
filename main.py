@@ -2,10 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 import csv
-import codecs
-import nltk
-import pandas as pd
-import sql
+
 
 timestamp = datetime.datetime.now()
 
@@ -24,7 +21,7 @@ def get_html(url, params=''):
 
 
 def get_content(html):
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     items = soup.find_all(class_='vacancy-serp-item')
     vacancy = []
     for item in items:
@@ -85,7 +82,7 @@ def parser():
     if html.status_code == 200:
         print('fgh')
         vacancy = []
-        for page in range(0, 5):
+        for page in range(0, 11):
             print(f'Парсим страницу {page}')
             html = get_html(URL, params={'page': page})
             vacancy.extend(get_content(html.text))
