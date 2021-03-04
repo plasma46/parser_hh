@@ -29,7 +29,7 @@ def get_content(html):
             vacancy.append(
                 {'name': item.find(class_='bloko-link').get_text(),
                  'salary': item.find('span', {'class': 'bloko-section-header-3 bloko-section-header-3_lite',
-                                              'data-qa': 'vacancy-serp__vacancy-compensation'}).get_text(strip=True),
+                                              'data-qa': 'vacancy-serp__vacancy-compensation'}),
                  'company': item.find(class_='bloko-link bloko-link_secondary').get_text(strip=True),
                  'link': item.find(class_='bloko-link HH-LinkModifier HH-VacancyActivityAnalytics-Vacancy').attrs[
                      'href'],
@@ -42,7 +42,7 @@ def get_content(html):
                  }
             )
         except AttributeError :
-            {'salary': 'Не указана'}
+            continue
 
     # , 'data-qa': 'vacancy-serp__vacancy-employer'})
     return vacancy
@@ -71,8 +71,12 @@ def save_csv (items):
         writer.writerow(['Должность','ЗП','Компания','ссылка'
                             ,'Описание','Требование','Дата обновления','метка'])
         for item in items:
-            writer.writerow([item['name'], item['salary'], item['company'], item['link']
+            try:
+                writer.writerow([item['name'], item['salary'].get_text(strip=True), item['company'], item['link']
                                 , item['opis'], item['treb'], item['date'], item['timestamp']])
+            except AttributeError :
+                writer.writerow([item['name'],'Не указана', item['company'], item['link']
+                                    , item['opis'], item['treb'], item['date'], item['timestamp']])
 
 
 
@@ -82,7 +86,7 @@ def parser():
     if html.status_code == 200:
         print('fgh')
         vacancy = []
-        for page in range(0, 11):
+        for page in range(0, 8):
             print(f'Парсим страницу {page}')
             html = get_html(URL, params={'page': page})
             vacancy.extend(get_content(html.text))
